@@ -104,7 +104,7 @@ footer{text-align:center;padding:3rem 2rem;border-top:1px solid var(--border);co
 </div></section>
 
 <section id="content"><div class="section-header"><div class="section-label">Portfolio</div><h2 class="section-title">Featured Content</h2></div>
-<div class="content-grid">
+<div class="content-grid" id="content-grid">
 <div class="card"><span class="tag">Thread</span><h4>MWX AI Educational Content</h4><p>Strategic educational content for the Base community.</p><a class="content-link" href="https://x.com/defidukejnr/status/2025822145742352670" target="_blank">View on X →</a></div>
 <div class="card"><span class="tag">Thread</span><h4>KachingVIP Ecosystem Awareness</h4><p>Content driving engagement and awareness on Solana.</p><a class="content-link" href="https://x.com/defidukejnr/status/2056898422888665263" target="_blank">View on X →</a></div>
 <div class="card"><span class="tag">Thread</span><h4>Clarnium Campaign Content</h4><p>Promotional and educational content supporting community initiatives.</p><a class="content-link" href="https://x.com/i/status/2061341679571861857" target="_blank">View on X →</a></div>
@@ -188,6 +188,30 @@ const supabase = createClient(
   "https://nynfxibyddunayylelkw.supabase.co",
   "sb_publishable_uN-0ZnDbiTBx4XaYWUGK7g_9uHiu8ic"
 );
+
+
+// ---- Featured Content: loaded from the Supabase "content" table ----
+// If the table is empty or can't be reached, the cards already on the page stay as they are.
+const esc = (t) => String(t ?? "").replace(/[&<>"']/g, (c) => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+
+async function loadContent() {
+  const grid = document.getElementById("content-grid");
+  if (!grid) return;
+  const { data, error } = await supabase
+    .from("content")
+    .select("tag,title,description,link,button_text")
+    .eq("is_visible", true)
+    .order("sort_order", { ascending: true });
+
+  if (error) { console.error("Content load failed:", error.message, error); return; }
+  if (!data || data.length === 0) { console.warn("Content table returned 0 visible rows."); return; }
+
+  grid.innerHTML = data.map((c) => {
+    const safeLink = /^https?:\/\//i.test(c.link || "") ? c.link : "#";
+    return `<div class="card reveal show"><span class="tag">${esc(c.tag)}</span><h4>${esc(c.title)}</h4><p>${esc(c.description)}</p><a class="content-link" href="${esc(safeLink)}" target="_blank" rel="noopener">${esc(c.button_text || "View on X →")}</a></div>`;
+  }).join("");
+}
+loadContent();
 
 const form = document.getElementById("contact-form");
 const status = document.getElementById("form-status");
