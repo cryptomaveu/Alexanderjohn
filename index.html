@@ -123,12 +123,12 @@ footer{text-align:center;padding:3rem 2rem;border-top:1px solid var(--border);co
 
 <section id="network"><div class="section-header"><div class="section-label">Connections</div><h2 class="section-title">Network & Relationships</h2></div>
 <div class="network-grid">
-<div class="card"><h3><i class="fas fa-users"></i> Active Communities</h3><ul class="network-list"><li>MWX AI — Ambassador</li><li>CoinW — Ambassador</li><li>KachingVIP — Ambassador</li><li>FlipFlop — Ambassador</li><li>PenxChain — Community Manager</li><li>Chainforge Ecosystem — Founder</li></ul></div>
-<div class="card"><h3><i class="fas fa-handshake"></i> Collaborations</h3><ul class="network-list"><li>Web3 ambassadors across AI, DeFi, and infrastructure</li><li>Community managers and ecosystem builders</li><li>Project founders and team partnerships</li><li>Cross-project introductions and brokered deals</li></ul></div>
+<div class="card"><h3><i class="fas fa-users"></i> Active Communities</h3><ul class="network-list" id="list-communities"><li>MWX AI — Ambassador</li><li>CoinW — Ambassador</li><li>KachingVIP — Ambassador</li><li>FlipFlop — Ambassador</li><li>PenxChain — Community Manager</li><li>Chainforge Ecosystem — Founder</li></ul></div>
+<div class="card"><h3><i class="fas fa-handshake"></i> Collaborations</h3><ul class="network-list" id="list-collaborations"><li>Web3 ambassadors across AI, DeFi, and infrastructure</li><li>Community managers and ecosystem builders</li><li>Project founders and team partnerships</li><li>Cross-project introductions and brokered deals</li></ul></div>
 </div></section>
 
 <section id="value"><div class="section-header"><div class="section-label">Why Me</div><h2 class="section-title">What I Bring to the Table</h2></div>
-<div class="value-grid">
+<div class="value-grid" id="value-grid">
 <div class="card"><div class="value-icon"><i class="fas fa-users-gear"></i></div><h4>Community Management</h4><p>Building, moderating, and nurturing thriving communities.</p></div>
 <div class="card"><div class="value-icon"><i class="fas fa-chart-line"></i></div><h4>Growth Strategy</h4><p>Data-driven approaches to user acquisition, retention, and expansion.</p></div>
 <div class="card"><div class="value-icon"><i class="fas fa-pen-fancy"></i></div><h4>Content Creation</h4><p>Educational threads, promotional content, and creative campaigns.</p></div>
@@ -212,6 +212,42 @@ async function loadContent() {
   }).join("");
 }
 loadContent();
+
+
+// ---- Network lists: loaded from the Supabase "network" table ----
+async function loadNetwork() {
+  const { data, error } = await supabase
+    .from("network")
+    .select("category,text")
+    .eq("is_visible", true)
+    .order("sort_order", { ascending: true });
+  if (error) { console.error("Network load failed:", error.message, error); return; }
+  if (!data || data.length === 0) return;
+  for (const cat of ["communities", "collaborations"]) {
+    const rows = data.filter((r) => r.category === cat);
+    const ul = document.getElementById("list-" + cat);
+    if (ul && rows.length) ul.innerHTML = rows.map((r) => `<li>${esc(r.text)}</li>`).join("");
+  }
+}
+loadNetwork();
+
+// ---- What I Bring to the Table: loaded from the Supabase "strengths" table ----
+async function loadStrengths() {
+  const grid = document.getElementById("value-grid");
+  if (!grid) return;
+  const { data, error } = await supabase
+    .from("strengths")
+    .select("icon,title,description")
+    .eq("is_visible", true)
+    .order("sort_order", { ascending: true });
+  if (error) { console.error("Strengths load failed:", error.message, error); return; }
+  if (!data || data.length === 0) return;
+  grid.innerHTML = data.map((r) => {
+    const icon = /^fa-[a-z0-9-]+$/.test(r.icon || "") ? r.icon : "fa-star";
+    return `<div class="card reveal show"><div class="value-icon"><i class="fas ${icon}"></i></div><h4>${esc(r.title)}</h4><p>${esc(r.description)}</p></div>`;
+  }).join("");
+}
+loadStrengths();
 
 const form = document.getElementById("contact-form");
 const status = document.getElementById("form-status");
