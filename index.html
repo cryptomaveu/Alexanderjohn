@@ -79,7 +79,7 @@ footer{text-align:center;padding:3rem 2rem;border-top:1px solid var(--border);co
 <a href="#partnerships" class="btn btn-primary"><i class="fas fa-rocket"></i> View My Work</a>
 <a href="#contact" class="btn btn-secondary"><i class="fas fa-handshake"></i> Let's Collaborate</a>
 </div>
-<div class="hero-socials">
+<div class="hero-socials" id="hero-socials">
 <a href="https://x.com/DefiDukejnr" target="_blank" class="social-link"><i class="fab fa-x-twitter"></i></a>
 <a href="https://www.linkedin.com/in/alexander-john-8079a13a8" target="_blank" class="social-link"><i class="fab fa-linkedin-in"></i></a>
 <a href="https://linktr.ee/Defidukejnr" target="_blank" class="social-link"><i class="fas fa-link"></i></a>
@@ -145,9 +145,9 @@ footer{text-align:center;padding:3rem 2rem;border-top:1px solid var(--border);co
 <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Send</button>
 <p id="form-status" class="form-status" role="status"></p>
 </form>
-<div class="cta-buttons"><a href="https://x.com/DefiDukejnr" target="_blank" class="btn btn-primary"><i class="fab fa-x-twitter"></i> Message on X</a><a href="https://t.me/Defidukejr" target="_blank" class="btn btn-secondary"><i class="fab fa-telegram"></i> Telegram</a><a href="https://www.linkedin.com/in/alexander-john-8079a13a8" target="_blank" class="btn btn-secondary"><i class="fab fa-linkedin"></i> LinkedIn</a></div></div></section>
+<div class="cta-buttons" id="cta-buttons"><a href="https://x.com/DefiDukejnr" target="_blank" class="btn btn-primary"><i class="fab fa-x-twitter"></i> Message on X</a><a href="https://t.me/Defidukejr" target="_blank" class="btn btn-secondary"><i class="fab fa-telegram"></i> Telegram</a><a href="https://www.linkedin.com/in/alexander-john-8079a13a8" target="_blank" class="btn btn-secondary"><i class="fab fa-linkedin"></i> LinkedIn</a></div></div></section>
 
-<footer><div class="hero-socials"><a href="https://x.com/DefiDukejnr" class="social-link"><i class="fab fa-x-twitter"></i></a><a href="https://www.linkedin.com/in/alexander-john-8079a13a8" class="social-link"><i class="fab fa-linkedin-in"></i></a><a href="https://linktr.ee/Defidukejnr" class="social-link"><i class="fas fa-link"></i></a><a href="https://t.me/Defidukejr" class="social-link"><i class="fab fa-telegram"></i></a></div><p>© 2026 Alexander (DeFi Duke). Built with passion for Web3.</p></footer>
+<footer><div class="hero-socials" id="footer-socials"><a href="https://x.com/DefiDukejnr" class="social-link"><i class="fab fa-x-twitter"></i></a><a href="https://www.linkedin.com/in/alexander-john-8079a13a8" class="social-link"><i class="fab fa-linkedin-in"></i></a><a href="https://linktr.ee/Defidukejnr" class="social-link"><i class="fas fa-link"></i></a><a href="https://t.me/Defidukejr" class="social-link"><i class="fab fa-telegram"></i></a></div><p>© 2026 Alexander (DeFi Duke). Built with passion for Web3.</p></footer>
 
 <script>
 document.addEventListener('DOMContentLoaded', () => {
@@ -248,6 +248,39 @@ async function loadStrengths() {
   }).join("");
 }
 loadStrengths();
+
+
+// ---- Social links: loaded from the Supabase "social_links" table ----
+async function loadSocials() {
+  const { data, error } = await supabase
+    .from("social_links")
+    .select("label,url,icon,button_text,in_hero,in_contact,in_footer")
+    .eq("is_visible", true)
+    .order("sort_order", { ascending: true });
+  if (error) { console.error("Social links load failed:", error.message, error); return; }
+  if (!data || data.length === 0) return;
+
+  const okUrl = (u) => (/^(https?:\/\/|mailto:)/i.test(u || "") ? u : "#");
+  const okIcon = (i) => (/^fa[a-z]* [a-z0-9 -]+$/i.test(i || "") ? i : "fas fa-link");
+  const iconLink = (r) => `<a href="${esc(okUrl(r.url))}" target="_blank" rel="noopener" class="social-link" aria-label="${esc(r.label)}"><i class="${esc(okIcon(r.icon))}"></i></a>`;
+
+  const hero = document.getElementById("hero-socials");
+  const foot = document.getElementById("footer-socials");
+  const cta = document.getElementById("cta-buttons");
+
+  const heroRows = data.filter((r) => r.in_hero);
+  const footRows = data.filter((r) => r.in_footer);
+  const ctaRows = data.filter((r) => r.in_contact);
+
+  if (hero && heroRows.length) hero.innerHTML = heroRows.map(iconLink).join("");
+  if (foot && footRows.length) foot.innerHTML = footRows.map(iconLink).join("");
+  if (cta && ctaRows.length) {
+    cta.innerHTML = ctaRows.map((r, i) =>
+      `<a href="${esc(okUrl(r.url))}" target="_blank" rel="noopener" class="btn ${i === 0 ? "btn-primary" : "btn-secondary"}"><i class="${esc(okIcon(r.icon))}"></i> ${esc(r.button_text || r.label)}</a>`
+    ).join("");
+  }
+}
+loadSocials();
 
 const form = document.getElementById("contact-form");
 const status = document.getElementById("form-status");
