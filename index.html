@@ -67,7 +67,7 @@ footer{text-align:center;padding:3rem 2rem;border-top:1px solid var(--border);co
 <nav><div class="nav-container">
 <div class="logo">DeFi Duke</div>
 <ul class="nav-links">
-<li><a href="#about">About</a></li><li><a href="#partnerships">Partnerships</a></li><li><a href="#content">Content</a></li><li><a href="#audience">Audience</a></li><li><a href="#network">Network</a></li><li><a href="#contact">Contact</a></li>
+<li><a href="#about">About</a></li><li><a href="#partnerships">Partnerships</a></li><li><a href="#experience">Experience</a></li><li><a href="#content">Content</a></li><li><a href="#audience">Audience</a></li><li><a href="#network">Network</a></li><li><a href="#contact">Contact</a></li>
 </ul>
 </div></nav>
 
@@ -102,6 +102,12 @@ footer{text-align:center;padding:3rem 2rem;border-top:1px solid var(--border);co
 <div class="card"><span class="tag">Multi-chain · Ambassador</span><h3>FlipFlop</h3><p><b>Duration:</b> February 2025 – November 2025</p><p><b>Focus:</b> Community growth, content marketing, ecosystem awareness.</p><p><b>Results:</b> Increased awareness and participation.</p></div>
 <div class="card"><span class="tag">Multi-chain · Founder</span><h3>Chainforge Ecosystem</h3><p><b>Duration:</b> October 2025 – Present</p><p><b>Focus:</b> Ecosystem development, partnerships, community building.</p><p><b>Results:</b> Established ecosystem presence and strategic relationships.</p></div>
 </div></section>
+
+<section id="experience"><div class="section-header"><div class="section-label">Background</div><h2 class="section-title">More Experience</h2><p class="section-desc">Community and business roles beyond ambassador work.</p></div>
+<div class="partnerships-grid" id="experience-grid"><div class="card"><span class="tag">Business Development</span><h3>Victus Global</h3><p><b>Duration:</b> January 2026 – Present</p><p><b>Focus:</b> Business development, approaching merchants and other contacts to open partnerships.</p></div><div class="card"><span class="tag">Community Manager</span><h3>Penxchain</h3><p><b>Duration:</b> 2024 – 2025</p><p><b>Focus:</b> Community engagement, member support, project awareness and communications.</p></div><div class="card"><span class="tag">Community Manager</span><h3>mewcafe</h3><p><b>Duration:</b> 2024 (6 months)</p><p><b>Focus:</b> Community engagement, member onboarding, keeping conversations constructive.</p></div><div class="card"><span class="tag">Community Moderator</span><h3>Haven1</h3><p><b>Focus:</b> Community discussions, member assistance, keeping the community organized and welcoming.</p></div><div class="card"><span class="tag">Community Moderator</span><h3>Sundog</h3><p><b>Focus:</b> Supporting members and active discussions, community engagement and project awareness.</p></div></div></section>
+
+<section id="background"><div class="section-header"><div class="section-label">Credentials</div><h2 class="section-title">Trading, Scale & Education</h2></div>
+<div class="partnerships-grid" id="background-grid"><div class="card"><span class="tag">Trading</span><h3>Funded Trader</h3><p><b>Focus:</b> Crypto and prop firm trading. Funded trader with FundedNext, FundingPips and Upscale.</p></div><div class="card"><span class="tag">Community Scale</span><h3>118,000-Member Discord</h3><p><b>Focus:</b> Moderation of the largest Discord community I have worked in.</p></div><div class="card"><span class="tag">Education</span><h3>University of Uyo</h3><p><b>Degree:</b> Bachelor of Engineering, Electrical Engineering.</p></div></div></section>
 
 <section id="content"><div class="section-header"><div class="section-label">Portfolio</div><h2 class="section-title">Featured Content</h2></div>
 <div class="content-grid" id="content-grid">
@@ -145,7 +151,7 @@ footer{text-align:center;padding:3rem 2rem;border-top:1px solid var(--border);co
 <button type="submit" class="btn btn-primary"><i class="fas fa-paper-plane"></i> Send</button>
 <p id="form-status" class="form-status" role="status"></p>
 </form>
-<div class="cta-buttons" id="cta-buttons"><a href="https://x.com/DefiDukejnr" target="_blank" class="btn btn-primary"><i class="fab fa-x-twitter"></i> Message on X</a><a href="https://t.me/Defidukejr" target="_blank" class="btn btn-secondary"><i class="fab fa-telegram"></i> Telegram</a><a href="https://www.linkedin.com/in/alexander-john-8079a13a8" target="_blank" class="btn btn-secondary"><i class="fab fa-linkedin"></i> LinkedIn</a></div></div></section>
+<div class="cta-buttons" id="cta-buttons"><a href="https://x.com/DefiDukejnr" target="_blank" class="btn btn-primary"><i class="fab fa-x-twitter"></i> Message on X</a><a href="https://t.me/Defidukejr" target="_blank" class="btn btn-secondary"><i class="fab fa-telegram"></i> Telegram</a><a href="https://www.linkedin.com/in/alexander-john-8079a13a8" target="_blank" class="btn btn-secondary"><i class="fab fa-linkedin"></i> LinkedIn</a></div><p style="margin-top:1.5rem;color:var(--text-secondary)">Email: <a href="mailto:alexandermeier.jnr@gmail.com" style="color:#818cf8">alexandermeier.jnr@gmail.com</a></p></div></section>
 
 <footer><div class="hero-socials" id="footer-socials"><a href="https://x.com/DefiDukejnr" class="social-link"><i class="fab fa-x-twitter"></i></a><a href="https://www.linkedin.com/in/alexander-john-8079a13a8" class="social-link"><i class="fab fa-linkedin-in"></i></a><a href="https://linktr.ee/Defidukejnr" class="social-link"><i class="fas fa-link"></i></a><a href="https://t.me/Defidukejr" class="social-link"><i class="fab fa-telegram"></i></a></div><p>© 2026 Alexander (DeFi Duke). Built with passion for Web3.</p></footer>
 
@@ -319,6 +325,24 @@ async function loadAudience() {
   ).join("");
 }
 loadAudience();
+
+// ---- More Experience: loaded from the Supabase "experience" table ----
+async function loadExperience() {
+  const grid = document.getElementById("experience-grid");
+  if (!grid) return;
+  const { data, error } = await supabase
+    .from("experience")
+    .select("tag,name,duration,focus")
+    .eq("is_visible", true)
+    .order("sort_order", { ascending: true });
+  if (error) { console.error("Experience load failed:", error.message, error); return; }
+  if (!data || data.length === 0) return;
+  const line = (label, val) => (val ? `<p><b>${label}:</b> ${esc(val)}</p>` : "");
+  grid.innerHTML = data.map((r) =>
+    `<div class="card reveal show"><span class="tag">${esc(r.tag)}</span><h3>${esc(r.name)}</h3>${line("Duration", r.duration)}${line("Focus", r.focus)}</div>`
+  ).join("");
+}
+loadExperience();
 
 const form = document.getElementById("contact-form");
 const status = document.getElementById("form-status");
